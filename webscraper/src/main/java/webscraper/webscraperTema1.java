@@ -69,7 +69,7 @@ public class webscraperTema1 {
 		ordenar_por_rating(tiobe_languages);
 		
 		//imprimir en pantalla
-		
+		imprimir_en_pantalla(tiobe_languages);		
 		
 		//Gráfico ordenado por apariciones
 		ordenar_por_apariciones(tiobe_languages);
@@ -155,6 +155,14 @@ public class webscraperTema1 {
 		}
 	}
 	
+	public static void imprimir_en_pantalla(List<Language_data> tiobe_languages){
+		System.out.printf("%20s%20s%20s","NOMBRE_LENGUAJE","RATING_GITHUB","NRO_APARICIONES\n");
+		for( int i=0;i<tiobe_languages.size();i++ ){
+			Language_data language = tiobe_languages.get(i);
+			System.out.printf("%20s%20s%20s\n",language.getNombre(),language.getRating(),language.getApariciones());
+		}
+	}
+	
 	
 	public static void mostrar_ventana(List<Language_data> tiobe_languages){
 		String titulo = "10 lenguajes con mayor número de apariciones";
@@ -187,7 +195,7 @@ public class webscraperTema1 {
 		tiobe_language_names.add("c");
 		tiobe_language_names.add("java");
 		tiobe_language_names.add("cpp");
-		/*tiobe_language_names.add("csharp");
+		tiobe_language_names.add("csharp");
 		tiobe_language_names.add("vbnet");
 		tiobe_language_names.add("javascript");
 		tiobe_language_names.add("assembly-language");
@@ -203,7 +211,7 @@ public class webscraperTema1 {
 		tiobe_language_names.add("lua");
 		tiobe_language_names.add("ruby");
 		tiobe_language_names.add("matlab");
-		*/
+		
 		return(tiobe_language_names);
 	}
 	
