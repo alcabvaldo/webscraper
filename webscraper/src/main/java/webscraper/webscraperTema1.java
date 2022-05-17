@@ -2,14 +2,10 @@ package webscraper;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.NumberFormat;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFrame;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -49,7 +45,6 @@ public class webscraperTema1 {
 	public static int max_apariciones = 0;
 	public static int min_apariciones = 100000000;
 
-
     
 	public static void main(String[] args){
                 
@@ -84,6 +79,7 @@ public class webscraperTema1 {
 			tiobe_languages.add(lenguage);
 		}       
 	}
+	
 	
 	public static void ordenar_por_rating(List<Language_data> tiobe_languages){
 		//https://stackoverflow.com/questions/10396970
@@ -132,6 +128,7 @@ public class webscraperTema1 {
 		}
 	}
 	
+	
 	//source: https://www.w3schools.com/java/java_files_create.asp
 	public static void guardar_en_txt(List<Language_data> tiobe_languages){
 		try {
@@ -154,6 +151,7 @@ public class webscraperTema1 {
 			tiobe_languages.get(i).setRating(rating_github);
 		}
 	}
+	
 	
 	public static void imprimir_en_pantalla(List<Language_data> tiobe_languages){
 		System.out.printf("%20s%20s%20s","NOMBRE_LENGUAJE","RATING_GITHUB","NRO_APARICIONES\n");
@@ -189,6 +187,7 @@ public class webscraperTema1 {
         frame.setVisible(true);
 	}
         
+	
 	public static List get_lista_language_names(){
 		List<String> tiobe_language_names = new ArrayList<String>();
 		tiobe_language_names.add("python");

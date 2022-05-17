@@ -11,7 +11,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JFrame;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,26 +25,39 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 
+    class tag_class{
+        private String nombre_tag;
+        private int nro_apariciones;
 
+        public tag_class(String nombre_tag, int nro_apariciones) {
+            this.nombre_tag = nombre_tag;
+            this.nro_apariciones = nro_apariciones;
+        }
+
+        //getters
+        public String getNombre() { return nombre_tag; }
+        public Integer getApariciones() {  return nro_apariciones; }
+
+        //setters
+        public void setNombre(String nombre_lenguaje) {  this.nombre_tag = nombre_lenguaje; }
+        public void setApariciones(int nro_apariciones) {  this.nro_apariciones = nro_apariciones; }
+    }
 
 
 public class webscraperTema2 {
+    public static String tema_de_interes = "bot";
 
     public webscraperTema2() {
     }
     
 	public static void main(String[] args){
-        String tema_de_interes = "bot";
         // se deja la url incompleta para agregarle despues el nro de pagina
-		String link_github = "https://github.com/topics/bot?o=desc&s=updated&page=";
-		List<String> tiobe_language_names = new ArrayList<String>();
-		List<String> tiobe_language_number = new ArrayList<String>();
-		
-		
-		tiobe_language_names.add("c");
+		String parametros_url = "?o=desc&s=updated&page=";
+		String link_github = "https://github.com/topics/"+tema_de_interes+parametros_url;
+		Map<String,Integer> tags_map = new HashMap<>();
+		List<tag_class> lista_tags = new ArrayList<tag_class>();
 		
 		//conseguir las apariciones de github
                 int numero=10;
@@ -60,10 +77,12 @@ public class webscraperTema2 {
                             if(actualizado_treinta_dias(fecha_articulo)){
                                 //System.out.println("Está actualizado");
 								String tag_class = "topic-tag topic-tag-link f6 mb-2";
-                                Elements lista_tags = articulo.getElementsByClass(tag_class);
-                                for(Element tag : lista_tags){
+                                Elements lista_tags_elemento = articulo.getElementsByClass(tag_class);
+                                for(Element tag : lista_tags_elemento){
 									//aca se van a guardar las tags con un contador
-                                    //System.out.println(tag.text());
+									//https://stackoverflow.com/questions/81346/
+									tags_map.merge(tag.text(), 1, Integer::sum);
+									//si no hay key coloca 1, si ya existe suma 1
                                 }
                             }
                         }
@@ -75,43 +94,61 @@ public class webscraperTema2 {
                         System.out.println(e.getMessage());
                     }
 		}
-                
-		/*
-		//guardar los datos en un txt
-                //https://www.w3schools.com/java/java_files_create.asp
-                try {
-                    FileWriter myWriter = new FileWriter("Resultados.txt");
-                    myWriter.write("Files in Java might be tricky, but it is fun enough!");
-                    myWriter.close();
-                    System.out.println("Successfully wrote to the file.");
-                } catch (IOException e) {
-                    System.out.println("An error occurred.");
-                    e.printStackTrace();
-                }
 		
-		//Gráfico
-		String titulo = "10 lenguajes con mayor número de apariciones";
-		String ejeX = "NOMBRE_LENGUAJE";
-		String ejeY = "NRO_APARICIONES";
-		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-                    dataset.setValue(6, "test", "A");
-                    dataset.setValue(7, "test", "B");
-                    dataset.setValue(15, "test", "C");
-		JFreeChart barChart = ChartFactory.createBarChart(
-				titulo,ejeX,ejeY,dataset,
-				PlotOrientation.VERTICAL,false, true, false);
-		mostrar_ventana(barChart);
-                
-                */
+		//cambio de hashmap a arraylist para poder ordenar
+		for(String nombre: tags_map.keySet()){
+			tag_class tag = new tag_class(nombre,tags_map.get(nombre));
+			lista_tags.add(tag);
+		}
+		
+		//ordenar en forma descendiente
+		ordenar_por_apariciones(lista_tags);
+		
+		//imprimir los resultados en pantalla
+		for( int i=0;i<lista_tags.size();i++ ){
+			System.out.println(lista_tags.get(i).getApariciones()+"\t"+lista_tags.get(i).getNombre());
+		}
+		
+		
+		//Gráfico ordenado por apariciones
+		mostrar_ventana(lista_tags);
+	}
+	
+	public static void ordenar_por_apariciones(List<tag_class> lista_tags){
+		//https://stackoverflow.com/questions/10396970
+		Collections.sort(lista_tags, new Comparator<tag_class>() {
+			@Override
+			public int compare(tag_class o1, tag_class o2) {
+				return o2.getApariciones().compareTo(o1.getApariciones());
+			}
+		});
 	}
 	
 	
-	//source:https://stackoverflow.com/questions/23665260
-	public static void mostrar_ventana(JFreeChart chart){
+	
+	public static void mostrar_ventana(List<tag_class> lista_tags){
+		String titulo = "20 palabras relacionadas con "+tema_de_interes+" con mayor número de apariciones";
+		String ejeX = "TOPIC";
+		String ejeY = "NRO_APARICIONES";
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
 		
+		//si se encontro menos de 20 tags
+		int limite =(lista_tags.size()<20)?lista_tags.size():20;
+		
+		//se cargan los datos en el grafico
+		for( int i=0;i<limite;i++ ){
+			int numero_apariciones;
+			numero_apariciones = lista_tags.get(i).getApariciones();
+			dataset.setValue(numero_apariciones,"test",lista_tags.get(i).getNombre());
+		}
+		JFreeChart barChart = ChartFactory.createBarChart(
+				titulo,ejeX,ejeY,dataset,
+				PlotOrientation.VERTICAL,false, true, false);
+		
+		//source:https://stackoverflow.com/questions/23665260
         JFrame frame = new JFrame("Tabla");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(new ChartPanel(chart));
+        frame.add(new ChartPanel(barChart));
         frame.setLocationByPlatform(true);
         frame.pack();
         frame.setVisible(true);
