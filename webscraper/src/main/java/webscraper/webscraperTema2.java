@@ -44,10 +44,9 @@ public class webscraperTema2 {
     }
     
 	public static void main(String[] args){
-		//Map<String,Integer> tags_map = new HashMap<>();
 		
 		//conseguir las apariciones de github
-        int cant_paginas_a_probar=15;
+        int cant_paginas_a_probar=10;
 		Map<String,Integer> tags_map = get_tags_relacionadas(cant_paginas_a_probar);
 		
 		
@@ -154,17 +153,15 @@ public class webscraperTema2 {
     //verifica si la fecha recibida es de hace menos de 30 dias
 	//https://stackoverflow.com/questions/20165564/calculating-days-between-two-dates-with-java
 	public static boolean actualizado_treinta_dias(String fecha_articulo_str){
-			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ssX");
-            LocalDateTime fecha_actual = LocalDateTime.now();
-			LocalDateTime fecha_articulo = LocalDateTime.parse(fecha_articulo_str, dtf);
-            //System.out.println("fecha recibida: "+fecha_articulo+"fecha actual: "+fecha_actual);
-			long daysBetween = Duration.between(fecha_articulo, fecha_actual).toDays();
-            //System.out.println("Days between: "+daysBetween);
-			if (daysBetween<=30){
-				return(true);
-			}else{
-				return(false);
-			}
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HH:mm:ssX");
+		LocalDateTime fecha_actual = LocalDateTime.now();
+		LocalDateTime fecha_articulo = LocalDateTime.parse(fecha_articulo_str, dtf);
+		long daysBetween = Duration.between(fecha_articulo, fecha_actual).toDays();
+		if (daysBetween<=30){
+			return(true);
+		}else{
+			return(false);
+		}
 	}
 }
 
